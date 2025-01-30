@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask RESTful API</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script>
+        async function fetchItems() {
+            const response = await fetch('/api/items');
+            const items = await response.json();
+            document.getElementById('items').innerHTML = items
+                .map(item => `<li>${item.name}: $${item.price} (ID: ${item.id})</li>`)
+                .join('');
+        }
+
+        async function addItem() {
+            const name = document.getElementById('name').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const response = await fetch('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, price })
+            });
+            if (response.ok) fetchItems();
+        }
+
+        async function updateItem() {
+            const id = parseInt(document.getElementById('updateId').value);
+            const price = parseFloat(document.getElementById('updatePrice').value);
+            const response = await fetch(`/api/items/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price })
+            });
+            if (response.ok) fetchItems();
+        }
+
+        async function deleteItem() {
+            const id = parseInt(document.getElementById('deleteId').value);
+            const response = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+            if (response.ok) fetchItems();
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchItems);
+    </script>
+</head>
+<body>
+    <h1>Flask RESTful API</h1>
+    <section>
+        <h2>Items List</h2>
+        <ul id="items"></ul>
+    </section>
+    <section>
+        <h2>Add Item</h2>
+        <input type="text" id="name" placeholder="Name">
+        <input type="number" id="price" placeholder="Price">
+        <button onclick="addItem()">Add Item</button>
+    </section>
+    <section>
+        <h2>Update Item</h2>
+        <input type="number" id="updateId" placeholder="Item ID">
+        <input type="number" id="updatePrice" placeholder="New Price">
+        <button onclick="updateItem()">Update Item</button>
+    </section>
+    <section>
+        <h2>Delete Item</h2>
+        <input type="number" id="deleteId" placeholder="Item ID">
+        <button onclick="deleteItem()">Delete Item</button>
+    </section>
+</body>
+</html>
